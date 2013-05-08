@@ -1,9 +1,12 @@
 var LevelController = function(m, delegate){
 	var self = mvc.controller.apply(this, [m, delegate]);
+	var min = {x: 32, y: 75};
+	var max = {x: 450, y: 460};
 	this.controllers = [];
 	this.load_view = function(canvas){
 		this.view = new LevelView(canvas, this, this.model);
 		this.controllers.forEach(function(c){
+			c.model.subscribe("position", self);
 			c.refresh();
 		});
 		return this.view;
@@ -11,7 +14,15 @@ var LevelController = function(m, delegate){
 	this.will_release = function(){
 		
 	};
-	this.update = function(keys, modifier){
+	this.update = function(key, old, v, m){
+		if(key === "position"){
+			if(v.x >= max.x) m.position.x = max.x - 1;
+			if(v.y >= max.y) m.position.y = max.y - 1;
+			if(v.x <= min.x) m.position.x = min.x + 1;
+			if(v.y <= min.y) m.position.y = min.y + 1;
+		}
+	};
+	this.refresh = function(keys, modifier){
 		this.view.refresh();
 		this.controllers.forEach(function(c){
 			c.update(keys, modifier);
