@@ -61,7 +61,39 @@ var Level = function(monsterCount, goal, heroSpeed, monsterSpeed) {
 	
 	return this;
 };
-
+var Monster = function(obj){
+    var self = mvc.model.apply(this, [obj]);
+	var _position = {x: 0, y: 0};
+	Object.defineProperty(this, "position", {
+		get: function(){return _position;}
+		, set: function(v){
+			var old = _position;
+			_position = v;
+			self.changed("position", old, v);
+		}
+	});
+	
+	var _speed = {x: 3, y: 3};
+	Object.defineProperty(this, "speed", {
+		get: function(){return _speed;}
+		, set: function(v){
+			var old = _speed;
+			_speed = v;
+			self.changed("speed", old, v);
+		}
+	});
+	var _damage = 0;
+	Object.defineProperty(this, "damage", {
+		get: function(){return _damage;}
+		, set: function(v){
+			var old = _damage;
+			v = v > self.health ? self.health : v;
+			_damage = v;
+			self.changed("damage", old, v);
+		}
+	});
+	return this;
+};
 var Hero = function(obj){
     var self = mvc.model.apply(this, [obj]);
 	var _damage = 0;
@@ -106,18 +138,6 @@ var Hero = function(obj){
 	});
 	
 	this.subscribe("damage", this);
-	
-	/*
-    this.Speed = speed;
-    this.X = Game.Canvas.width / 2;
-    this.Y = Game.Canvas.height / 2;
-    this.Ready = false;
-    this.ImageSrc = 'Content/img/hero.png';
-    this.Image = null;
-    this.Direction = Game.Entity.Direction.Down;
-    this.Health = 100;
-    this.Projectiles = [];
-	*/
 	this.update = function(key, old, v, obj){
 		if(key === "damage") _health -= v;
 	};
